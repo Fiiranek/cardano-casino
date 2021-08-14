@@ -1,0 +1,5 @@
+.appBody {
+  padding: 2rem;
+  background: var(--middleBlue);
+  min-height: 80vh;
+}

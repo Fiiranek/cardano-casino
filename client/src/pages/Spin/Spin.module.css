@@ -1,0 +1,28 @@
+.spinBox {
+  display: flex;
+  align-items: center;
+}
+.spin {
+  width: 500px;
+  height: 500px;
+  background: grey;
+}
+.spinTile {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 10px;
+  /* transition: 1s; */
+}
+.playerNick {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.pointer {
+  position: absolute;
+  height: 10px;
+  width: 50px;
+  background: black;
+}

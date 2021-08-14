@@ -1,0 +1,25 @@
+:root {
+  --darkBlue: #16181f;
+  --normalBlue: #24252f;
+  --middleBlue: #1a1c24;
+  --yellow: #e9b10e;
+  --green: #02bf4d;
+  --normalGrey: #9293a6;
+  --radius: 5px;
+}
+
+.btn {
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  color: var(--darkBlue);
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.btnYellow {
+  background: var(--yellow);
+}
+.btnGreen {
+  background: var(--green);
+}
