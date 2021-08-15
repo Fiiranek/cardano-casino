@@ -10,3 +10,29 @@ export const updateJackpotTotaBet = (value) => {
     value,
   };
 };
+
+export const updateJackpotCountdownState = (value) => {
+  return {
+    type: "UPDATE_JACKPOT_COUNTDOWN",
+    value,
+  };
+};
+export const updateJackpotCountdownSeconds = (value) => {
+  return {
+    type: "UPDATE_JACKPOT_COUNTDOWN_SECONDS",
+    value,
+  };
+};
+export const updateJackpotDrawingState = (value) => {
+  return {
+    type: "UPDATE_JACKPOT_DRAWING",
+    value,
+  };
+};
+
+// export const markWinnerInPlayers = (value) => {
+//   return {
+//     type: "UPDATE_JACKPOT_WINNER",
+//     value,
+//   };
+// };

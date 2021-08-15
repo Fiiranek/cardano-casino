@@ -9,6 +9,7 @@ function SpinTile({ player, totalBet }) {
       style={{
         height: `${player.size * 500}px`,
         background: player.color,
+        border: player.winner ? "2px solid green" : "none",
       }}
     >
       <span className={styles.playerNick}>

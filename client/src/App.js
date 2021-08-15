@@ -12,16 +12,45 @@ import Register from "./pages/Auth/Register";
 import { useAuth } from "./contexts/AuthContext";
 import Roulette from "./pages/Roulette/Roulette";
 import { useDispatch } from "react-redux";
-import { updateJackpotPlayers, updateJackpotTotaBet } from "./store/actions";
+import {
+  updateJackpotPlayers,
+  updateJackpotTotaBet,
+  updateJackpotCountdownState,
+  updateJackpotCountdownSeconds,
+  updateJackpotDrawingState,
+} from "./store/actions";
 function App({ socket }) {
   let dispatch = useDispatch();
   const { currentUser } = useAuth();
 
   useEffect(() => {
     socket.on("place_bet", (jackpotData) => {
-      console.log(jackpotData);
       dispatch(updateJackpotPlayers(jackpotData.players));
       dispatch(updateJackpotTotaBet(jackpotData.totalBet));
+    });
+
+    socket.on("jackpot_start_countdown", () => {
+      dispatch(updateJackpotCountdownState(true));
+    });
+
+    socket.on("jackpot_end_countdown", () => {
+      dispatch(updateJackpotCountdownState(false));
+      dispatch(updateJackpotCountdownSeconds(0));
+    });
+
+    socket.on("jackpot_countdown_seconds_increase", (data) => {
+      console.log(data);
+      dispatch(updateJackpotCountdownSeconds(data.seconds));
+    });
+
+    socket.on("jackpot_start_drawing", () => {
+      dispatch(updateJackpotDrawingState(true));
+    });
+
+    socket.on("jackpot_draw", (data) => {
+      console.log("draw");
+      console.log(data.players);
+      dispatch(updateJackpotPlayers(data.players));
     });
   }, []);
 

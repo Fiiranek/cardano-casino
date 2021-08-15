@@ -6,45 +6,17 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useDispatch, useSelector } from "react-redux";
 
 export function Jackpot({ socket }) {
-  let dispatch = useDispatch();
+  // let dispatch = useDispatch();
   let { currentUser } = useAuth();
   const players = useSelector((state) => state.jackpotPlayers);
   const totalBet = useSelector((state) => state.totalBet);
-
-  //const [players, setPlayers] = useState([]);
-  // const [totalBet, setTotalBet] = useState(0);
+  const countdownState = useSelector((state) => state.jackpotCountdownState);
+  const drawingState = useSelector((state) => state.jackpotDrawingState);
+  const countdownSeconds = useSelector(
+    (state) => state.jackpotCountdownSeconds
+  );
 
   const [betValue, setBetValue] = useState(0);
-
-  // const getTotalBet = (players) => {
-  //   return players.reduce((total, player) => total + player.bet, 0);
-  // };
-
-  // const getPlayersWithChances = (players, totalBet) => {
-  //   return [
-  //     ...(players = players.map((player) => {
-  //       return { ...player, size: player.bet / totalBet };
-  //     })),
-  //   ];
-  // };
-
-  const randomHexColor = () => {
-    let n = (Math.random() * 0xfffff * 1000000).toString(16);
-    return "#" + n.slice(0, 6);
-  };
-
-  // const placeBet = (newPlayer) => {
-  //   console.log(newPlayer);
-  //   // let newPlayers = [...players];
-  //   // newPlayers.push(newPlayer);
-  //   dispatch(placeBet("ss"));
-  //   // let newTotalBet = getTotalBet(newPlayers);
-  //   // setTotalBet(newTotalBet);
-  //   // newPlayers = [...getPlayersWithChances(newPlayers, newTotalBet)];
-
-  //   //setPlayers([...newPlayers]);
-  // };
-
   useEffect(() => {
     console.log(players, "upp");
   }, [players]);
@@ -94,6 +66,13 @@ export function Jackpot({ socket }) {
     }
   };
 
+  useEffect(() => {
+    console.log(drawingState);
+    if (drawingState) {
+      console.log("start drawing");
+    }
+  }, [drawingState]);
+
   return (
     <div className={styles.jackpotContainer}>
       <div className={styles.jackpotTop}>
@@ -130,6 +109,18 @@ export function Jackpot({ socket }) {
         </button>
         <button className={styles.modifyBetBtn}>MAX</button>
       </div>
+
+      {countdownState ? (
+        <span className={styles.jackpotCountdownSpan}>
+          Starts in {countdownSeconds}s ...
+        </span>
+      ) : drawingState ? (
+        <span className={styles.jackpotCountdownSpan}>Drawing...</span>
+      ) : (
+        <span className={styles.jackpotCountdownSpan}>
+          Waiting for players...
+        </span>
+      )}
 
       <div className={styles.jackpotBottom}>
         <div className={styles.jackpotBottomLeft}>
