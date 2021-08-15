@@ -1,0 +1,89 @@
+.jackpotContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: var(--normalBlue);
+  border-radius: var(--radius);
+  padding: 2rem;
+}
+.jackpotTop {
+  border-radius: var(--radius);
+  background: var(--darkBlue);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.jackpot {
+  border-radius: var(--radius);
+  width: 500px;
+  height: 500px;
+  background: var(--darkBlue);
+  color: var(--normalGrey);
+  font-size: 2rem;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  padding: 0.5rem;
+}
+
+.jackpotTile {
+  width: 95%;
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+  /* min-height: 10px; */
+  padding: 1rem 0.5rem;
+  margin: 0.25rem 0;
+  border-radius: var(--radius);
+  background: var(--lightBlue);
+  color: var(--normalGrey);
+  /* transition: 1s; */
+}
+.playerNick {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.pointer {
+  position: absolute;
+  height: 10px;
+  width: 50px;
+  background: black;
+}
+.placeBetBtn {
+  border: none;
+  border-radius: var(--radius);
+  background: var(--lightBlue);
+  color: white;
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+  padding: 0.5rem;
+  transition: var(--hoverTransition);
+}
+.placeBetBtn:hover {
+  cursor: pointer;
+  background: var(--moreLightBlue);
+  transition: var(--hoverTransition);
+}
+.betInput {
+  background: transparent;
+  border: none;
+  color: var(--normalGrey);
+}
+.modifyBetBtn {
+  color: var(--normalGrey);
+  background: transparent;
+  border: none;
+  transition: var(--hoverTransition);
+}
+.modifyBetBtn:hover {
+  cursor: pointer;
+  transition: var(--hoverTransition);
+  color: var(--hoverGrey);
+}
+.betInput,
+.modifyBetBtn {
+  margin: 0 0.25rem;
+  font-size: 1rem;
+}

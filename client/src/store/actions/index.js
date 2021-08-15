@@ -1,13 +1,12 @@
-export const increment = (value = 1) => {
-    return {
-        type: 'INCREMENT',
-        value
-    }
-}
-
-export const decrement = (value = 1) => {
-    return {
-        type: 'DECREMENT',
-        value
-    }
-}
+export const updateJackpotPlayers = (value) => {
+  return {
+    type: "UPDATE_JACKPOT_PLAYERS",
+    value,
+  };
+};
+export const updateJackpotTotaBet = (value) => {
+  return {
+    type: "UPDATE_JACKPOT_TOTAL_BET",
+    value,
+  };
+};

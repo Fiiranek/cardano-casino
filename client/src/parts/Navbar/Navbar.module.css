@@ -13,6 +13,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 10%;
 }
 .navbarRight {
   flex-grow: 20;
@@ -21,6 +22,7 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
+  width: 90%;
 }
 .navbarLogo {
   width: 5rem;
@@ -33,23 +35,29 @@
   align-items: center;
 }
 .navbarTop {
-  padding: 1rem;
+  /* padding: 1rem; */
   background: var(--darkBlue);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.navbarTop > a {
-  font-size: 1rem;
-  margin: 0 0.5rem;
+.navbarTopSide {
+  padding: 1rem 0;
+}
+.navbarTopSide a {
+  font-size: 0.8rem;
+  margin: 1rem 0.5rem;
 }
 .navbarBottom {
   display: flex;
   justify-content: space-between;
-  padding: 1.25rem 1rem;
+  /* padding: 0.75rem; */
   background: var(--normalBlue);
 }
 
 .navbarBottom a {
-  font-size: 1.2rem;
-  margin: 0 0.5rem;
+  font-size: 1rem;
+  margin: 1rem 0.5rem;
 }
 .navbarBottomSide {
   display: flex;

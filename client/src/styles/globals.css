@@ -2,9 +2,13 @@
   --darkBlue: #16181f;
   --normalBlue: #24252f;
   --middleBlue: #1a1c24;
+  --lightBlue: #333541;
+  --moreLightBlue: #454957;
   --yellow: #e9b10e;
   --green: #02bf4d;
   --normalGrey: #9293a6;
+  --hoverGrey: #b8b9ce;
+  --hoverTransition: 0.2s;
   --radius: 5px;
 }
 
@@ -13,7 +17,7 @@
   border-radius: var(--radius);
   padding: 0.5rem 1rem;
   color: var(--darkBlue);
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: bold;
 }
 

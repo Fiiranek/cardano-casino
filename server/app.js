@@ -32,8 +32,6 @@ async function main() {
   });
 
   app.get("/users", async (req, res) => {
-    console.log("get users");
-    console.log(req.query.userId);
     await Database.getUserData(client, req, res);
   });
 

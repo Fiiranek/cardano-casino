@@ -1,7 +1,6 @@
 export default class Utils {
   static getRandomArrElement = (arr) => {
     let randomIndex = Math.floor(Math.random() * arr.length);
-    console.log(arr[randomIndex]);
     return arr[randomIndex];
   };
 

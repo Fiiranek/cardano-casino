@@ -2,15 +2,19 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
-// import { createStore } from "redux";
-// import { Provider } from "react-redux";
-// import { allReducers } from "./store/reducers";
+import { createStore } from "redux";
+import { Provider } from "react-redux";
+import { allReducers } from "./store/reducers";
 import { AuthProvider } from "./contexts/AuthContext";
-// const store = createStore(allReducers);
+import { socket } from "./services/Socket";
+const store = createStore(allReducers);
+
 ReactDOM.render(
   <React.StrictMode>
     <AuthProvider>
-      <App />
+      <Provider store={store}>
+        <App socket={socket} />
+      </Provider>
     </AuthProvider>
   </React.StrictMode>,
   document.getElementById("root")

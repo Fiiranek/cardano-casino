@@ -16,13 +16,24 @@ function Navbar() {
 
       <div className={styles.navbarRight}>
         <div className={styles.navbarTop}>
-          <Link to="/fairness">Fairness</Link>
-          <Link to="/bonuses">Bonuses</Link>
-          <Link to="/about">About</Link>
+          <div className={styles.navbarTopSide}>
+            <Link to="/fairness">Fairness</Link>
+            <Link to="/bonuses">Bonuses</Link>
+            <Link to="/about">About</Link>
+          </div>
+          <div className={styles.navbarTopSide}>
+            {currentUser ? (
+              <Link onClick={logoutUser}>Logout</Link>
+            ) : (
+              <div></div>
+            )}
+          </div>
         </div>
+
         <div className={styles.navbarBottom}>
           <div className={styles.navbarBottomSide}>
-            <Link to="/spin">Spin</Link>
+            <Link to="/jackpot">Jackpot</Link>
+            <Link to="/roulette">Roulette</Link>
             <Link to="/coinflip">Coinflip</Link>
             <Link to="/wagers">Wagers</Link>
           </div>
@@ -32,22 +43,16 @@ function Navbar() {
               <div className="btn btnGreen">Deposit</div>
             </Link>
             {currentUser ? (
+              <div className="btn btnYellow">{currentUser.balance} ADA</div>
+            ) : undefined}
+            {currentUser ? (
               <Link to="/account">
-                <div className="btn btnYellow">
-                  Account {currentUser.username}
-                </div>
+                <div className="btn btnYellow">{currentUser.username}</div>
               </Link>
             ) : (
               <Link to="/login">
                 <div className="btn btnYellow">Login</div>
               </Link>
-            )}
-            {currentUser ? (
-              <button className="btn btnYellow" onClick={logoutUser}>
-                Logout
-              </button>
-            ) : (
-              <div></div>
             )}
           </div>
         </div>

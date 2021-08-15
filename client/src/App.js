@@ -1,17 +1,30 @@
 import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import "./App.css";
 import "./styles/globals.css";
+import { useEffect } from "react";
 import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
 import Contact from "./pages/Contact/Contact";
 import Navbar from "./parts/Navbar/Navbar";
-import Spin from "./pages/Spin/Spin";
-import Spin2 from "./pages/Spin/Spin2";
+import { Jackpot, JackpotParent } from "./pages/Jackpot/Jackpot";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import { useAuth } from "./contexts/AuthContext";
-function App() {
+import Roulette from "./pages/Roulette/Roulette";
+import { useDispatch } from "react-redux";
+import { updateJackpotPlayers, updateJackpotTotaBet } from "./store/actions";
+function App({ socket }) {
+  let dispatch = useDispatch();
   const { currentUser } = useAuth();
+
+  useEffect(() => {
+    socket.on("place_bet", (jackpotData) => {
+      console.log(jackpotData);
+      dispatch(updateJackpotPlayers(jackpotData.players));
+      dispatch(updateJackpotTotaBet(jackpotData.totalBet));
+    });
+  }, []);
+
   return (
     <BrowserRouter>
       <div className="App">
@@ -20,7 +33,11 @@ function App() {
           <div className="appBody">
             <Route path="/about" component={(props) => <About />} />
             <Route path="/contact" component={(props) => <Contact />} />
-            <Route path="/spin" component={(props) => <Spin />} />
+            <Route
+              path="/jackpot"
+              component={() => <Jackpot socket={socket} />}
+            />
+            <Route path="/roulette" component={(props) => <Roulette />} />
             <Route
               path="/login"
               component={(props) =>

@@ -19,7 +19,7 @@ class Database {
       return;
     }
     const userRegisterQuery = await client.query(
-      "INSERT INTO users(user_id,username,email,wallet_address,balance) VALUES ($1,$2,$3,$4,0)",
+      "INSERT INTO users(user_id,username,email,wallet_address,balance,start_balance) VALUES ($1,$2,$3,$4,0,0)",
       [userId, username, email, walletAddress]
     );
     if (userRegisterQuery.rowCount !== 1) {

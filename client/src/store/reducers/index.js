@@ -1,7 +1,11 @@
-import { counter } from './counter'
+import {
+  jackpotPlayersReducer,
+  jackpotTotalBetReducer,
+} from "./jackpotReducer";
 
-import { combineReducers } from 'redux'
+import { combineReducers } from "redux";
 
 export const allReducers = combineReducers({
-    counter:counter
-})
+  jackpotPlayers: jackpotPlayersReducer,
+  jackpotTotalBet: jackpotTotalBetReducer,
+});
