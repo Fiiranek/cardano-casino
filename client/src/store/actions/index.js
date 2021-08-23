@@ -30,6 +30,13 @@ export const updateJackpotDrawingState = (value) => {
   };
 };
 
+export const updateJackpotState = (value) => {
+  return {
+    type: "UPDATE_JACKPOT_STATE",
+    value,
+  };
+};
+
 // export const markWinnerInPlayers = (value) => {
 //   return {
 //     type: "UPDATE_JACKPOT_WINNER",

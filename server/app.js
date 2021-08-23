@@ -9,7 +9,6 @@ const SOCKET_PORT = 8000;
 const API_PORT = 5000;
 const Database = require("./Database").Database;
 const server = http.createServer(app);
-const sockets = new Socket(server);
 
 async function main() {
   app.use(express.json());
@@ -27,6 +26,7 @@ async function main() {
 
   const client = await Database.connect(config.DB_CONFIG);
 
+  const sockets = new Socket(server, client);
   app.post("/registerUser", async (req, res) => {
     await Database.registerUser(client, req, res);
   });

@@ -18,6 +18,7 @@ import {
   updateJackpotCountdownState,
   updateJackpotCountdownSeconds,
   updateJackpotDrawingState,
+  updateJackpotState,
 } from "./store/actions";
 function App({ socket }) {
   let dispatch = useDispatch();
@@ -25,32 +26,40 @@ function App({ socket }) {
 
   useEffect(() => {
     socket.on("place_bet", (jackpotData) => {
+      console.log("place bet");
+      console.log(jackpotData);
       dispatch(updateJackpotPlayers(jackpotData.players));
       dispatch(updateJackpotTotaBet(jackpotData.totalBet));
     });
 
-    socket.on("jackpot_start_countdown", () => {
-      dispatch(updateJackpotCountdownState(true));
-    });
+    // socket.on("jackpot_start_countdown", () => {
+    //   dispatch(updateJackpotCountdownState(true));
+    // });
 
-    socket.on("jackpot_end_countdown", () => {
-      dispatch(updateJackpotCountdownState(false));
-      dispatch(updateJackpotCountdownSeconds(0));
-    });
+    // socket.on("jackpot_end_countdown", () => {
+    //   dispatch(updateJackpotCountdownState(false));
+    //   dispatch(updateJackpotCountdownSeconds(0));
+    // });
 
-    socket.on("jackpot_countdown_seconds_increase", (data) => {
+    socket.on("increase_jackpot_countdown", (data) => {
       console.log(data);
       dispatch(updateJackpotCountdownSeconds(data.seconds));
     });
 
-    socket.on("jackpot_start_drawing", () => {
-      dispatch(updateJackpotDrawingState(true));
+    // socket.on("jackpot_start_drawing", () => {
+    //   dispatch(updateJackpotDrawingState(true));
+    // });
+
+    socket.on("draw_jackpot", (data) => {
+      console.log("-------------------");
+      console.log(data.players[0].winner);
+      console.log(data.players[1].winner);
+      dispatch(updateJackpotPlayers(data.players));
     });
 
-    socket.on("jackpot_draw", (data) => {
-      console.log("draw");
-      console.log(data.players);
-      dispatch(updateJackpotPlayers(data.players));
+    socket.on("change_jackpot_state", (data) => {
+      console.log(data.state);
+      dispatch(updateJackpotState(data.state));
     });
   }, []);
 

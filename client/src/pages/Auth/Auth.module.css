@@ -38,6 +38,11 @@
   color: white;
   margin: 0 1rem;
 }
+.helpSpan {
+  color: white;
+  margin: 0 1rem;
+  max-width: 20%;
+}
 .authBtn {
   width: 100%;
 }

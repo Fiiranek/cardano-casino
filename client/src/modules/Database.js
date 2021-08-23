@@ -9,11 +9,21 @@ export default class Database {
         "Content-Type": "application/json",
       },
     });
-    const result = await response.json();
+    //const result = await response.json();
+    const result = await response;
     return result;
   }
 
-  static getUserData(userId) {
-    return fetch(API_URL + "/users?userId=" + userId);
+  // static getUserData(userId) {
+  //   return fetch(API_URL + "/users?userId=" + userId);
+  // }
+
+  static async getUserData(userReceiveAddress) {
+    const response = await fetch(
+      API_URL + "/users?userReceiveAddress=" + userReceiveAddress
+    );
+    const data = await response.json();
+    if (data.msg) return false;
+    return data;
   }
 }

@@ -17,4 +17,26 @@ export default class Utils {
       }
     }
   };
+
+  static async getReceiveAddress() {
+    if (window.cardano) {
+      let baseAddresses = await window.cardano.getUsedAddresses();
+      return baseAddresses[0];
+    }
+    return false;
+  }
+
+  static async getSendAddress() {
+    if (window.cardano) {
+      let baseAddresses = await window.cardano.getUsedAddresses();
+      return baseAddresses[0];
+    }
+    return false;
+  }
+
+  static convertBaseAddressToCardanoAddress(baseAddress) {
+    // convert
+
+    return baseAddress;
+  }
 }

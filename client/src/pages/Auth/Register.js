@@ -50,6 +50,22 @@ function Register() {
     // });
   };
 
+  const submitForm2 = async (e) => {
+    e.preventDefault();
+    setErrorMsg("");
+
+    const registerResult = await registerUser(credentials);
+    console.log(registerResult);
+    if (registerResult) {
+      setSuccessMsg("Registered!");
+      setTimeout(() => {
+        history.push("/jackpot");
+      }, 3000);
+    } else {
+      setErrorMsg("Something went wrong :(");
+    }
+  };
+
   const changeCredentials = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
@@ -63,7 +79,7 @@ function Register() {
       <span className={styles.successMsg + " " + styles.msg}>
         {successMsg.length > 0 ? successMsg : ""}
       </span>
-      <form className={styles.authForm} onSubmit={(e) => submitForm(e)}>
+      {/* <form className={styles.authForm} onSubmit={(e) => submitForm(e)}>
         <input
           onChange={(e) => changeCredentials(e)}
           name="walletAddress"
@@ -117,6 +133,26 @@ function Register() {
         <button type="submit" className={"btn btnGreen " + styles.authBtn}>
           Register
         </button>
+  </form>*/}
+
+      <form className={styles.authForm} onSubmit={(e) => submitForm2(e)}>
+        <input
+          onChange={(e) => changeCredentials(e)}
+          name="username"
+          placeholder="Username"
+          type="text"
+          className={styles.authInput}
+          required={true}
+        ></input>
+
+        <button type="submit" className={"btn btnGreen " + styles.authBtn}>
+          Register
+        </button>
+        {/*<span className={styles.helpSpan}>
+          By clicking "Register" You will get prompt with Nami Wallet
+          confirmation window. To successfuly register, please give it acces to
+          our website
+        </span>*/}
       </form>
     </div>
   );

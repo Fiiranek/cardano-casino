@@ -7,19 +7,17 @@ import { useDispatch, useSelector } from "react-redux";
 
 export function Jackpot({ socket }) {
   // let dispatch = useDispatch();
-  let { currentUser } = useAuth();
+  let { currentUser, setCurrentUser } = useAuth();
   const players = useSelector((state) => state.jackpotPlayers);
-  const totalBet = useSelector((state) => state.totalBet);
-  const countdownState = useSelector((state) => state.jackpotCountdownState);
-  const drawingState = useSelector((state) => state.jackpotDrawingState);
+  const totalBet = useSelector((state) => state.jackpotTotalBet);
+  // const countdownState = useSelector((state) => state.jackpotCountdownState);
+  // const drawingState = useSelector((state) => state.jackpotDrawingState);
   const countdownSeconds = useSelector(
     (state) => state.jackpotCountdownSeconds
   );
+  const jackpotState = useSelector((state) => state.jackpotState);
 
   const [betValue, setBetValue] = useState(0);
-  useEffect(() => {
-    console.log(players, "upp");
-  }, [players]);
 
   const spin = () => {
     let minSpinNumber = 1000;
@@ -55,30 +53,42 @@ export function Jackpot({ socket }) {
   };
 
   const placeBetEmitter = (socket) => {
+    if (betValue <= 0) {
+      alert("Bet value must be bigger than 0");
+      return;
+    }
     if (currentUser) {
-      let newPlayer = {
-        userId: currentUser.uid,
-        username: currentUser.username,
-        bet: parseInt(betValue),
-      };
-      console.log("EMIT");
-      socket.emit("place_bet", newPlayer);
+      const canPlaceBet = betValue <= currentUser.balance;
+
+      if (canPlaceBet) {
+        let newPlayer = {
+          ...currentUser,
+          bet: betValue,
+        };
+        console.log("EMIT");
+        socket.emit("place_bet", newPlayer);
+
+        const newBalance = currentUser.balance - betValue;
+
+        setCurrentUser({ ...currentUser, balance: newBalance });
+      } else {
+        alert("Not enought ADA to place bet");
+      }
     }
   };
 
   useEffect(() => {
-    console.log(drawingState);
-    if (drawingState) {
-      console.log("start drawing");
-    }
-  }, [drawingState]);
+    console.log("STATE:", jackpotState);
+  }, [jackpotState]);
 
   return (
     <div className={styles.jackpotContainer}>
       <div className={styles.jackpotTop}>
         <button
           className={styles.placeBetBtn}
-          disabled={currentUser ? false : true}
+          disabled={
+            currentUser ? jackpotState === 2 || jackpotState === 3 : true
+          }
           onClick={() => placeBetEmitter(socket)}
         >
           PLACE BET
@@ -110,18 +120,33 @@ export function Jackpot({ socket }) {
         <button className={styles.modifyBetBtn}>MAX</button>
       </div>
 
-      {countdownState ? (
-        <span className={styles.jackpotCountdownSpan}>
-          Starts in {countdownSeconds}s ...
-        </span>
-      ) : drawingState ? (
-        <span className={styles.jackpotCountdownSpan}>Drawing...</span>
-      ) : (
+      {jackpotState === 0 ? (
         <span className={styles.jackpotCountdownSpan}>
           Waiting for players...
         </span>
-      )}
+      ) : undefined}
+      {jackpotState === 1 ? (
+        <span className={styles.jackpotCountdownSpan}>
+          Starts in {countdownSeconds}s ...
+        </span>
+      ) : undefined}
 
+      {jackpotState === 2 ? (
+        <span className={styles.jackpotCountdownSpan}>Drawing!</span>
+      ) : undefined}
+
+      {jackpotState === 3 ? (
+        <span className={styles.jackpotCountdownSpan}>End!</span>
+      ) : undefined}
+
+      {jackpotState === 4 ? (
+        <span className={styles.jackpotCountdownSpan}>
+          {players.filter((player) => player.winner)[0].username +
+            " is winner!"}
+        </span>
+      ) : undefined}
+
+      <span className={styles.jackpotCountdownSpan}>Total: {totalBet}</span>
       <div className={styles.jackpotBottom}>
         <div className={styles.jackpotBottomLeft}>
           <div className={styles.jackpot}>

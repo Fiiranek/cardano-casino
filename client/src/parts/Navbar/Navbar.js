@@ -50,8 +50,8 @@ function Navbar() {
                 <div className="btn btnYellow">{currentUser.username}</div>
               </Link>
             ) : (
-              <Link to="/login">
-                <div className="btn btnYellow">Login</div>
+              <Link to="/register">
+                <div className="btn btnYellow">Register</div>
               </Link>
             )}
           </div>

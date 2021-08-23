@@ -27,3 +27,6 @@
 .btnGreen {
   background: var(--green);
 }
+.btnDisabled {
+  cursor: not-allowed;
+}
