@@ -35,6 +35,10 @@ async function main() {
     await Database.getUserData(client, req, res);
   });
 
+  app.post("/deposit", async (req, res) => {
+    await Database.deposit(client, req, res);
+  });
+
   app.listen(API_PORT, () => {
     console.log(`Express app listening at http://localhost:${API_PORT}`);
   });

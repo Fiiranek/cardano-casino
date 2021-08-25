@@ -1,5 +1,6 @@
 const { Server } = require("socket.io");
 const Database = require("./Database").Database;
+const Jackpot = require("./Jackpot").Jackpot;
 const log = require("./Logger").log;
 const sortPlayersBySize = (players) => {
   players = [
@@ -38,38 +39,18 @@ class Socket {
     this.io = new Server(server);
     this.dbClient = dbClient;
 
-    this.jackpot = {
-      players: [],
-      winnerIndices: [],
-      totalBet: 0,
-      state: 0,
-      countdownSeconds: 50,
-      drawingRounds: 20,
-      drawingRoundDurationInMilliseconds: 250,
-      clearBetsTimeoutInMilliseconds: 5000,
-    };
-
-    // this.players = [];
-    // this.totalBet = 0;
-
-    // this.jackpotState = 0;
-
-    // this.countdownSeconds = 8;
-    // this.drawingRounds = 20;
-    // this.drawingRoundDurationInMilliseconds = 100;
+    this.jackpot = new Jackpot();
 
     this.clearJackpot();
 
     this.io.on("connection", (socket) => {
-      // this.io.emit("place_bet", {
-      //   players: this.jackpot.players,
-      //   totalBet: this.jackpot.totalBet,
-      //   state: this.jackpot.state,
-      // });
       this.onPlayerConnect();
+      console.log(socket.id);
       socket.on("place_bet", async (player, cb) => {
+        console.log("HERE");
         let tryToPlaceBet = await this.placeBetByPlayer(player);
         if (tryToPlaceBet) {
+          console.log("BET PLACED");
           if (this.jackpot.state === 0) {
             if (this.canStartCountdown()) {
               console.log("START COUNTDOWN");
@@ -91,6 +72,7 @@ class Socket {
               }
             }
           }
+        } else {
         }
       });
     });
@@ -136,7 +118,9 @@ class Socket {
       console.log(this.jackpot.totalBet);
 
       // log
-      log.info(`user_id ${player.user_id} put bet, bet value ${player.bet}`);
+      log.info(
+        `user_id ${player.receive_address} put bet, bet value ${player.bet}`
+      );
       return true;
     }
     return false;
@@ -158,56 +142,52 @@ class Socket {
 
   startDrawing() {
     console.log("START DRAWING");
-    // this.io.emit("jackpot_start_drawing");
     this.changeState(2);
 
     this.jackpot.players = sortPlayersBySize(this.jackpot.players);
 
     for (let i = 0; i < this.jackpot.drawingRounds; i++) {
-      // clear player winners field
-      // this.jackpot.players.forEach((player) => {
-      //   delete player.winner;
-      // });
-      // draw winner for each drawing round
-
-      // let winner = getRandomWinnerWithChances(this.jackpot.players);
-      // let winnerIndex = this.jackpot.players.findIndex(
-      //   (player) => player.receive_address === winner.receive_address
-      // );
-      // this.jackpot.players[winnerIndex].winner = true;
       let winnerIndex = Math.floor(Math.random() * this.jackpot.players.length);
-      // this.jackpot.players[winnerIndex].winner = true;
+
       this.jackpot.winnerIndices.push(winnerIndex);
-      setTimeout(() => {
+      setTimeout(async () => {
         this.jackpot.players.forEach((player) => {
           delete player.winner;
         });
         this.jackpot.players[this.jackpot.winnerIndices[i]].winner = true;
-        // console.log(playersCopy.filter((p) => p.winner));
+        let winner = this.jackpot.players[this.jackpot.winnerIndices[i]];
         this.io.emit("draw_jackpot", { players: this.jackpot.players });
         if (i === this.jackpot.drawingRounds - 1) {
-          this.changeState(4);
-
-          let clearbetsTimeoutInMilliseconds =
-            (i + 1) * this.jackpot.drawingRoundDurationInMilliseconds +
-            this.jackpot.clearBetsTimeoutInMilliseconds;
-          setTimeout(() => {
-            this.clearJackpot();
-          }, clearbetsTimeoutInMilliseconds);
+          await this.endDrawing(i, winner);
         }
       }, (i + 1) * this.jackpot.drawingRoundDurationInMilliseconds);
     }
+  }
 
-    // clear players and bets
-    // setTimeout(
-    //   () => this.clearJackpot(),
-    //   this.jackpot.clearBetsTimeoutInMilliseconds
-    // );
+  async endDrawing(i, winner) {
+    let prize = this.jackpot.calculateWinnerPrize();
+    this.changeState(3);
+
+    const isPrizeTransferredToWinner = await Database.transferPrizeToWinnerAccount(
+      this.dbClient,
+      prize,
+      winner
+    );
+    if (isPrizeTransferredToWinner) {
+      log.info(`${prize} prize transferred to ${winner.receive_address}`);
+      let clearbetsTimeoutInMilliseconds =
+        (i + 1) * this.jackpot.drawingRoundDurationInMilliseconds +
+        this.jackpot.clearBetsTimeoutInMilliseconds;
+      setTimeout(() => {
+        this.clearJackpot();
+      }, clearbetsTimeoutInMilliseconds);
+    } else {
+      log.info(`${prize} prize NOT transferred to ${winner.receive_address}`);
+    }
   }
 
   clearJackpot() {
     console.log("CLEAR JACKPOT");
-    console.log(this.jackpot);
     this.jackpot.players = [];
     this.jackpot.totalBet = 0;
     this.changeState(0);

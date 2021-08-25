@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./Jackpot.module.css";
+import Utils from "../../modules/Utils";
 function SpinTile({ player, totalBet }) {
   const percent = player.size * 100;
 
@@ -13,7 +14,8 @@ function SpinTile({ player, totalBet }) {
       }}
     >
       <span className={styles.playerNick}>
-        {player.username} - {percent.toFixed(2)}% WIN
+        {Utils.shortenAddress(player.receive_address)} - {percent.toFixed(2)}%
+        WIN
       </span>
     </div>
   );

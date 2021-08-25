@@ -3,15 +3,15 @@ import styles from "./Jackpot.module.css";
 import JackpotTile from "./JackpotTile";
 import Utils from "../../modules/Utils";
 import { useAuth } from "../../contexts/AuthContext";
-import { useDispatch, useSelector } from "react-redux";
-
+import { useSelector } from "react-redux";
+import { useAlert } from "react-alert";
+import Confetti from "react-confetti";
+import Database from "../../modules/Database";
 export function Jackpot({ socket }) {
-  // let dispatch = useDispatch();
   let { currentUser, setCurrentUser } = useAuth();
   const players = useSelector((state) => state.jackpotPlayers);
   const totalBet = useSelector((state) => state.jackpotTotalBet);
-  // const countdownState = useSelector((state) => state.jackpotCountdownState);
-  // const drawingState = useSelector((state) => state.jackpotDrawingState);
+  const confettiRef = useRef();
   const countdownSeconds = useSelector(
     (state) => state.jackpotCountdownSeconds
   );
@@ -19,23 +19,7 @@ export function Jackpot({ socket }) {
 
   const [betValue, setBetValue] = useState(0);
 
-  const spin = () => {
-    let minSpinNumber = 1000;
-    let maxSpinNumber = 3000;
-    let spinNumber = 78; //mocked
-
-    for (let i = 0; i < spinNumber; i++) {
-      setTimeout(() => {
-        alert(
-          "Winner: " +
-            Utils.getRandomWinnerWithChances(players).name +
-            " " +
-            (((i + 1) / spinNumber) * 100).toFixed() +
-            "%"
-        );
-      }, i * 50);
-    }
-  };
+  const alert = useAlert();
 
   const increaseBetBtnHandler = (e) => {
     setBetValue(betValue + parseFloat(e.target.value));
@@ -54,7 +38,7 @@ export function Jackpot({ socket }) {
 
   const placeBetEmitter = (socket) => {
     if (betValue <= 0) {
-      alert("Bet value must be bigger than 0");
+      alert.show("Bet value must be bigger than 0");
       return;
     }
     if (currentUser) {
@@ -65,24 +49,49 @@ export function Jackpot({ socket }) {
           ...currentUser,
           bet: betValue,
         };
-        console.log("EMIT");
         socket.emit("place_bet", newPlayer);
 
         const newBalance = currentUser.balance - betValue;
 
         setCurrentUser({ ...currentUser, balance: newBalance });
+        alert.show(`${betValue} ADA bet placed`);
+        console.log("BET PLACED");
       } else {
-        alert("Not enought ADA to place bet");
+        alert.show(`Not enough funds`);
       }
     }
   };
 
-  useEffect(() => {
-    console.log("STATE:", jackpotState);
-  }, [jackpotState]);
+  // useEffect(() => {
+  //   (async function () {
+  //     console.log("STATE:", jackpotState);
+  //     if (jackpotState === 3) {
+  //       console.log("UPDATED BALANCE");
+  //       let userReceiveAddress = currentUser.receive_address;
+  //       if (userReceiveAddress) {
+  //         let updatedUserData = await Database.getUserData(userReceiveAddress);
+  //         if (updatedUserData) {
+  //           console.log("----------------");
+  //           console.log(currentUser.balance);
+  //           console.log(updatedUserData.balance);
+  //           setCurrentUser({ ...currentUser, updatedUserData });
+  //         }
+  //       }
+  //     }
+  //   })();
+  // }, [jackpotState]);
 
   return (
     <div className={styles.jackpotContainer}>
+      <Confetti
+        ref={confettiRef}
+        style={{
+          display:
+            Utils.isUserWinner(currentUser, players) && jackpotState === 3
+              ? "block"
+              : "none",
+        }}
+      />
       <div className={styles.jackpotTop}>
         <button
           className={styles.placeBetBtn}
@@ -136,13 +145,11 @@ export function Jackpot({ socket }) {
       ) : undefined}
 
       {jackpotState === 3 ? (
-        <span className={styles.jackpotCountdownSpan}>End!</span>
-      ) : undefined}
-
-      {jackpotState === 4 ? (
         <span className={styles.jackpotCountdownSpan}>
-          {players.filter((player) => player.winner)[0].username +
-            " is winner!"}
+          {Utils.getWinner(players)
+            ? Utils.shortenAddress(Utils.getWinner(players).receive_address) +
+              " is winner!"
+            : ""}
         </span>
       ) : undefined}
 

@@ -1,4 +1,5 @@
 import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
+import { useState } from "react";
 import "./App.css";
 import "./styles/globals.css";
 import { useEffect } from "react";
@@ -9,9 +10,10 @@ import Navbar from "./parts/Navbar/Navbar";
 import { Jackpot, JackpotParent } from "./pages/Jackpot/Jackpot";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
+import Loading from "./parts/Loading/Loading";
 import { useAuth } from "./contexts/AuthContext";
 import Roulette from "./pages/Roulette/Roulette";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   updateJackpotPlayers,
   updateJackpotTotaBet,
@@ -20,50 +22,44 @@ import {
   updateJackpotDrawingState,
   updateJackpotState,
 } from "./store/actions";
+import Utils from "./modules/Utils";
+import Database from "./modules/Database";
 function App({ socket }) {
   let dispatch = useDispatch();
-  const { currentUser } = useAuth();
+  const { currentUser, setCurrentUser } = useAuth();
+  const players = useSelector((state) => state.jackpotPlayers);
+  const totalBet = useSelector((state) => state.jackpotTotalBet);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    // socket.onconnect = () => {
+    //   console.log("connected...");
+    //   setIsLoading(false);
+    //   // socket.emit("ehlo", currentUser);
+    // };
+
     socket.on("place_bet", (jackpotData) => {
-      console.log("place bet");
-      console.log(jackpotData);
       dispatch(updateJackpotPlayers(jackpotData.players));
       dispatch(updateJackpotTotaBet(jackpotData.totalBet));
     });
 
-    // socket.on("jackpot_start_countdown", () => {
-    //   dispatch(updateJackpotCountdownState(true));
-    // });
-
-    // socket.on("jackpot_end_countdown", () => {
-    //   dispatch(updateJackpotCountdownState(false));
-    //   dispatch(updateJackpotCountdownSeconds(0));
-    // });
-
     socket.on("increase_jackpot_countdown", (data) => {
-      console.log(data);
       dispatch(updateJackpotCountdownSeconds(data.seconds));
     });
 
-    // socket.on("jackpot_start_drawing", () => {
-    //   dispatch(updateJackpotDrawingState(true));
-    // });
-
     socket.on("draw_jackpot", (data) => {
-      console.log("-------------------");
-      console.log(data.players[0].winner);
-      console.log(data.players[1].winner);
       dispatch(updateJackpotPlayers(data.players));
     });
 
-    socket.on("change_jackpot_state", (data) => {
-      console.log(data.state);
+    socket.on("change_jackpot_state", async (data) => {
       dispatch(updateJackpotState(data.state));
     });
   }, []);
 
-  return (
+  return isLoading ? (
+    <Loading />
+  ) : (
     <BrowserRouter>
       <div className="App">
         <Navbar />

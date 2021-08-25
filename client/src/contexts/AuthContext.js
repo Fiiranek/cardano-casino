@@ -13,7 +13,8 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(undefined);
 
-  const registerUser = async (credentials) => {
+  //const registerUser = async (credentials) => {
+  const registerUser = async () => {
     // try {
     //   const result = await firebase
     //     .auth()
@@ -36,18 +37,12 @@ export function AuthProvider({ children }) {
     if (window.cardano) {
       const isCardanoEnabled = await window.cardano.enable();
       if (isCardanoEnabled) {
-        console.log(window.cardano);
-        let receiveAddress = (await window.cardano.getUsedAddresses())[0];
-
-        receiveAddress = Utils.convertBaseAddressToCardanoAddress(
-          receiveAddress
-        );
-
-        let sendAddress = (await window.cardano.getUsedAddresses())[0];
-        sendAddress = Utils.convertBaseAddressToCardanoAddress(sendAddress);
-
-        credentials.receiveAddress = receiveAddress;
-        credentials.sendAddress = sendAddress;
+        let receiveAddress = await Utils.getReceiveAddress();
+        let sendAddress = await Utils.getReceiveAddress();
+        let credentials = {
+          receiveAddress: receiveAddress,
+          sendAddress: sendAddress,
+        };
 
         const registerInDbResult = await Database.registerUser(credentials);
 
@@ -71,10 +66,11 @@ export function AuthProvider({ children }) {
 
   const loginUser = async () => {
     if (window.cardano) {
-      let isCardanoWalletInstalled = await window.cardano.isEnabled();
-      if (isCardanoWalletInstalled) {
+      let isCardanoEnabled = await window.cardano.isEnabled();
+      if (isCardanoEnabled) {
         let receiveAddress = await Utils.getReceiveAddress();
         let userData = await Database.getUserData(receiveAddress);
+        console.log(userData);
         if (userData) {
           setCurrentUser(userData);
           return userData;
@@ -119,11 +115,13 @@ export function AuthProvider({ children }) {
         await loginUser();
       } else {
         let tryLoginInterval = setInterval(async () => {
+          console.log("trying to login...");
           let userData = await loginUser();
-          if (userData || userData === false) {
+          console.log(userData);
+          if (userData || !userData) {
             clearInterval(tryLoginInterval);
           }
-        }, 3000);
+        }, 2000);
       }
     })();
   }, []);
