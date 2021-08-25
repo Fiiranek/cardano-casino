@@ -8,7 +8,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route('/withdraw', methods=['POST'])
 def withdraw():
-    withdraw_data = request.json
+    withdraw_data = request.get_json()
     print(withdraw_data)
 
     if withdraw_data:
