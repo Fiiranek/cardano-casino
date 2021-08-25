@@ -12,12 +12,14 @@ class DepositHandler:
     def add_deposits_to_users_balance(self):
         print('add deposit')
         utxos = get_utxos()
-        list_of_addresses_and_amounts = self.get_list_of_addresses_and_amounts()
         print(len(utxos))
-        for deposit_data in list_of_addresses_and_amounts:
-            response = requests.post(API_URL, json=deposit_data)
-            print(response.json())
-            response.close()
+        for utxo_data in utxos:
+            print(utxo_data)
+        #list_of_addresses_and_amounts = self.get_list_of_addresses_and_amounts()
+        # for deposit_data in list_of_addresses_and_amounts:
+        #     response = requests.post(API_URL, json=deposit_data)
+        #     print(response.json())
+        #     response.close()
 
     def match_utxo(self, utxo_data):
         address = self.get_address(utxo_data['utxo'])
