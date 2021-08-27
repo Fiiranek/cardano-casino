@@ -57,7 +57,7 @@ function Navbar() {
             {currentUser ? (
               <Link to="/account">
                 <div className="btn btnYellow">
-                  {Utils.shortenAddress(currentUser.receive_address)}
+                  {Utils.shortenAddress(currentUser.address)}
                 </div>
               </Link>
             ) : (

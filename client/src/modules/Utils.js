@@ -20,7 +20,7 @@ export default class Utils {
     }
   };
 
-  static async getReceiveAddress() {
+  static async getAddress() {
     if (window.cardano) {
       let baseAddresses = await window.cardano.getUsedAddresses();
       baseAddresses = Utils.convertBaseAddressToCardanoAddress(
@@ -31,16 +31,16 @@ export default class Utils {
     return false;
   }
 
-  static async getSendAddress() {
-    if (window.cardano) {
-      let baseAddresses = await window.cardano.getUsedAddresses();
-      baseAddresses = Utils.convertBaseAddressToCardanoAddress(
-        baseAddresses[0]
-      );
-      return baseAddresses;
-    }
-    return false;
-  }
+  // static async getSendAddress() {
+  //   if (window.cardano) {
+  //     let baseAddresses = await window.cardano.getUsedAddresses();
+  //     baseAddresses = Utils.convertBaseAddressToCardanoAddress(
+  //       baseAddresses[0]
+  //     );
+  //     return baseAddresses;
+  //   }
+  //   return false;
+  // }
 
   static convertBaseAddressToCardanoAddress(baseAddress) {
     // convert
@@ -49,12 +49,15 @@ export default class Utils {
   }
 
   static shortenAddress(address) {
-    const charsStartAndEndNumber = 6;
-    return (
-      address.substr(0, charsStartAndEndNumber) +
-      "..." +
-      address.substr(address.length - charsStartAndEndNumber, address.length)
-    );
+    if (address) {
+      const charsStartAndEndNumber = 6;
+      return (
+        address.substr(0, charsStartAndEndNumber) +
+        "..." +
+        address.substr(address.length - charsStartAndEndNumber, address.length)
+      );
+    }
+    return undefined;
   }
 
   static getWinner(players) {
@@ -65,7 +68,7 @@ export default class Utils {
     if (!user) return false;
     let winner = players.filter((player) => player.winner)[0];
     if (!winner) return false;
-    if (winner.receive_address === user.receive_address) {
+    if (winner.address === user.address) {
       return true;
     } else {
       return false;
@@ -78,6 +81,15 @@ export default class Utils {
     const prize = totalBet * (1 - commision);
     return prize;
   }
+
+  static isUserAlreadyInJackpot = (players, user) => {
+    for (let player of players) {
+      if (player.address === user.address) {
+        return true;
+      }
+    }
+    return false;
+  };
 }
 // let bytesAddr =
 //   "018d12641048dbf807e41bc3c84ae90658d9ac0e9cdace1585e2c237d9dc6ea8f9a30a14a5f4240cab68ff639b732cac1a9701bb6b881638fe";

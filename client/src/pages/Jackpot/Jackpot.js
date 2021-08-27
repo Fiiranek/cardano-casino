@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, Component } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./Jackpot.module.css";
 import JackpotTile from "./JackpotTile";
 import Utils from "../../modules/Utils";
@@ -6,7 +6,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useSelector } from "react-redux";
 import { useAlert } from "react-alert";
 import Confetti from "react-confetti";
-import Database from "../../modules/Database";
 
 export function Jackpot({ socket }) {
   let { currentUser, setCurrentUser } = useAuth();
@@ -37,7 +36,19 @@ export function Jackpot({ socket }) {
     setBetValue(0);
   };
 
-  const placeBetEmitter = (socket) => {
+  const placeBetEmitter = (socket, players, currentUser) => {
+    if (!currentUser) {
+      alertLib.show("You must register to join jackpot");
+      return false;
+    }
+    if (jackpotState === 2 || jackpotState === 3) {
+      alertLib.show("Can not join jackpot now");
+      return false;
+    }
+    if (Utils.isUserAlreadyInJackpot(players, currentUser)) {
+      alertLib.show("You are already in jackpot");
+      return false;
+    }
     if (betValue <= 0) {
       alertLib.show("Bet value must be bigger than 0");
       return;
@@ -63,49 +74,34 @@ export function Jackpot({ socket }) {
     }
   };
 
-  // useEffect(() => {
-  //   (async function () {
-  //     console.log("STATE:", jackpotState);
-  //     if (jackpotState === 3) {
-  //       console.log("UPDATED BALANCE");
-  //       let userReceiveAddress = currentUser.receive_address;
-  //       if (userReceiveAddress) {
-  //         let updatedUserData = await Database.getUserData(userReceiveAddress);
-  //         if (updatedUserData) {
-  //           console.log("----------------");
-  //           console.log(currentUser.balance);
-  //           console.log(updatedUserData.balance);
-  //           setCurrentUser({ ...currentUser, updatedUserData });
-  //         }
-  //       }
-  //     }
-  //   })();
-  // }, [jackpotState]);
+  useEffect(() => {
+    if (Utils.isUserWinner(currentUser, players) && jackpotState === 3) {
+      alertLib.success(
+        `You won! ${Utils.calculateWinnerPrize(totalBet)} ADA is Yours!`
+      );
+      confettiRef.current.style.display = "block";
+    } else {
+      confettiRef.current.style.display = "none";
+    }
+  }, [jackpotState]);
 
   return (
     <div className={styles.jackpotContainer}>
-      <Confetti
-        ref={confettiRef}
-        style={{
-          display:
-            Utils.isUserWinner(currentUser, players) && jackpotState === 3
-              ? "block"
-              : "none",
-        }}
-      />
+      <Confetti ref={confettiRef} />
       <div className={styles.jackpotTop}>
         <button
           className={styles.placeBetBtn}
           disabled={
             currentUser ? jackpotState === 2 || jackpotState === 3 : true
           }
-          onClick={() => placeBetEmitter(socket)}
+          onClick={() => placeBetEmitter(socket, players, currentUser)}
         >
           PLACE BET
         </button>
         <input
           className={styles.betInput}
           type="number"
+          step="1"
           min={0}
           max={1000000}
           value={betValue}
@@ -148,13 +144,14 @@ export function Jackpot({ socket }) {
       {jackpotState === 3 ? (
         <span className={styles.jackpotCountdownSpan}>
           {Utils.getWinner(players)
-            ? Utils.shortenAddress(Utils.getWinner(players).receive_address) +
+            ? Utils.shortenAddress(Utils.getWinner(players).address) +
               " is winner!"
             : ""}
         </span>
       ) : undefined}
 
       <span className={styles.jackpotCountdownSpan}>Total: {totalBet}</span>
+
       <div className={styles.jackpotBottom}>
         <div className={styles.jackpotBottomLeft}>
           <div className={styles.jackpot}>
@@ -167,7 +164,12 @@ export function Jackpot({ socket }) {
             )}
           </div>
         </div>
-        <div className={styles.jackpotBottomRight}></div>
+        <div className={styles.jackpotBottomRight}>
+          {/*} <div
+            className={styles.jackpot + " " + styles.jackpotPlayersList}
+            style={{ display: players.length > 0 ? "flex" : "none" }}
+            ></div>*/}
+        </div>
       </div>
     </div>
   );

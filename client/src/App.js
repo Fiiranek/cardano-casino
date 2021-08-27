@@ -7,26 +7,23 @@ import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
 import Contact from "./pages/Contact/Contact";
 import Navbar from "./parts/Navbar/Navbar";
-import { Jackpot, JackpotParent } from "./pages/Jackpot/Jackpot";
+import { Jackpot } from "./pages/Jackpot/Jackpot";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
+import Account from "./pages/Account/Account";
 import Loading from "./parts/Loading/Loading";
 import { useAuth } from "./contexts/AuthContext";
 import Roulette from "./pages/Roulette/Roulette";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   updateJackpotPlayers,
   updateJackpotTotaBet,
   updateJackpotCountdownSeconds,
   updateJackpotState,
 } from "./store/actions";
-import Utils from "./modules/Utils";
-import Database from "./modules/Database";
 function App({ socket }) {
   let dispatch = useDispatch();
-  const { currentUser, setCurrentUser } = useAuth();
-  const players = useSelector((state) => state.jackpotPlayers);
-  const totalBet = useSelector((state) => state.jackpotTotalBet);
+  const { currentUser } = useAuth();
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -37,6 +34,7 @@ function App({ socket }) {
     });
 
     socket.on("place_bet", (jackpotData) => {
+      console.log(jackpotData);
       dispatch(updateJackpotPlayers(jackpotData.players));
       dispatch(updateJackpotTotaBet(jackpotData.totalBet));
     });
@@ -50,12 +48,16 @@ function App({ socket }) {
     });
 
     socket.on("change_jackpot_state", async (data) => {
+      // if(data.state === 3 && ){
+      //   alert('You won')
+      // }
+
       dispatch(updateJackpotState(data.state));
     });
 
-    socket.on("update_jackpot_winner_data", async (winnerData) => {
-      console.log(winnerData);
-    });
+    // socket.on("update_jackpot_winner_data", async (winnerData) => {
+    //   console.log(winnerData);
+    // });
   }, []);
 
   return isLoading ? (
@@ -80,6 +82,12 @@ function App({ socket }) {
               }
             />
             <Route path="/register" component={(props) => <Register />} />
+            <Route
+              path="/account"
+              component={(props) =>
+                currentUser ? <Account /> : <Redirect to="/" />
+              }
+            />
             <Route path="/" component={(props) => <Home />} />
           </div>
         </Switch>

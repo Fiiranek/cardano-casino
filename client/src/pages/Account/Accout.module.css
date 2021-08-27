@@ -1,0 +1,17 @@
+.accountContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: var(--normalBlue);
+  border-radius: var(--radius);
+  padding: 2rem;
+  color: white;
+}
+
+.accountInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

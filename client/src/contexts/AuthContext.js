@@ -1,10 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import firebase from "../firebaseConfig";
-import Database from "../modules/Database";
-import { API_URL } from "../constants";
+import RequestManager from "../modules/RequestManager";
 import Utils from "../modules/Utils";
-import { send } from "process";
-import { useAlert } from "react-alert";
 const AuthContext = createContext();
 
 export function useAuth() {
@@ -29,7 +26,7 @@ export function AuthProvider({ children }) {
 
     //     // add userId to credentials
     //     credentials.userId = result.user.uid;
-    //     Database.registerUser(credentials);
+    //     RequestManager.registerUser(credentials);
     //   }
     //   return result;
     // } catch (err) {
@@ -38,14 +35,13 @@ export function AuthProvider({ children }) {
     if (window.cardano) {
       const isCardanoEnabled = await window.cardano.enable();
       if (isCardanoEnabled) {
-        let receiveAddress = await Utils.getReceiveAddress();
-        let sendAddress = await Utils.getReceiveAddress();
-        let credentials = {
-          receiveAddress: receiveAddress,
-          sendAddress: sendAddress,
-        };
+        let address = await Utils.getAddress();
 
-        const registerInDbResult = await Database.registerUser(credentials);
+        let credentials = { address };
+
+        const registerInDbResult = await RequestManager.registerUser(
+          credentials
+        );
 
         if (registerInDbResult.status === 200) {
           const userData = await registerInDbResult.clone().json();
@@ -54,6 +50,8 @@ export function AuthProvider({ children }) {
           alert("Registered!");
           return true;
         } else {
+          let errorMsg = await registerInDbResult.clone().json();
+          console.log(errorMsg);
           return false;
         }
       }
@@ -72,8 +70,8 @@ export function AuthProvider({ children }) {
     if (window.cardano) {
       let isCardanoEnabled = await window.cardano.isEnabled();
       if (isCardanoEnabled) {
-        let receiveAddress = await Utils.getReceiveAddress();
-        let userData = await Database.getUserData(receiveAddress);
+        let address = await Utils.getAddress();
+        let userData = await RequestManager.getUserData(address);
 
         if (userData) {
           setCurrentUser(userData);

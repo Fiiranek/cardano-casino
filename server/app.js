@@ -33,8 +33,7 @@ async function main() {
   });
 
   app.get("/users", async (req, res) => {
-    //await Database.getUserData(client, req, res);
-    let userAddress = req.query.userReceiveAddress;
+    let userAddress = req.query.userAddress || req.query.user_address;
     let userData = await Database.getUserData(client, userAddress);
 
     if (userData) {
@@ -45,9 +44,7 @@ async function main() {
   });
 
   app.post("/deposit", async (req, res) => {
-    const apiKey =
-      req.body.apiKey || req.header("apiKey") || req.headers["API_KEY"];
-    const isApiKeyValid = Utils.verifyApiKey(apiKey);
+    const isApiKeyValid = Utils.verifyApiKey(req);
     if (isApiKeyValid) {
       await Database.deposit(client, req, res);
     } else {

@@ -1,18 +1,13 @@
 const { Server } = require("socket.io");
 const Database = require("./Database").Database;
 const Jackpot = require("./Jackpot").Jackpot;
+const Utils = require("./Utils");
 const log = require("./Logger").log;
-const sortPlayersBySize = (players) => {
-  players = [
-    ...players.sort((player1, player2) => player1.size - player2.size),
-  ];
-  return players;
-};
 
 const getRandomWinnerWithChances = (players) => {
   let random = Math.random();
   // sort players by bet sizes
-  players = sortPlayersBySize(players);
+  players = Utils.sortPlayersBySize(players);
   for (let i = 0; i < players.length; i++) {
     if (i === 0) {
       if (random < players[i].size) {
@@ -24,14 +19,6 @@ const getRandomWinnerWithChances = (players) => {
   }
 };
 
-const getPlayersWithChances = (players, totalBet) => {
-  return [
-    ...(players = players.map((player) => {
-      return { ...player, size: player.bet / totalBet };
-    })),
-  ];
-};
-
 class Socket {
   io;
 
@@ -39,19 +26,50 @@ class Socket {
     this.io = new Server(server);
     this.dbClient = dbClient;
 
-    this.jackpot = new Jackpot();
+    this.jackpot = new Jackpot(this.io, dbClient);
 
     this.clearJackpot();
 
     this.io.on("connection", (socket) => {
       this.onPlayerConnect();
 
+      // DATABASE SOLUTION
+
+      // socket.on("place_bet", async (player, cb) => {
+      //   let placeBetResult = await this.jackpot.placeBet(player);
+      //   if (placeBetResult) {
+      //     let canStartCountdown = await this.jackpot.canStartCountdown();
+      //     if (canStartCountdown) {
+      //       this.jackpot.changeState(1, this.io);
+
+      //       for (let i = 0; i < this.jackpot.countdownSeconds; i++) {
+      //         setTimeout(async () => {
+      //           this.io.emit("increase_jackpot_countdown", {
+      //             seconds: this.jackpot.countdownSeconds - i,
+      //           });
+      //           if (i === this.jackpot.countdownSeconds - 1) {
+      //             // START DRAWING
+      //             let canStartDrawing = await this.jackpot.canStartDrawing();
+      //             if (canStartDrawing) {
+      //               this.jackpot.startDrawing(this.dbClient, this.io);
+      //             }
+      //           }
+      //         }, (i + 2) * 1000);
+      //       }
+      //     }
+      //   } else {
+      //     console.log("cant place bet");
+      //   }
+      // });
+
+      // MEMORY SOLUTION WITH METHODS IN JACKPOT
+
       socket.on("place_bet", async (player, cb) => {
-        let tryToPlaceBet = await this.placeBetByPlayer(player);
+        let tryToPlaceBet = await this.jackpot.placeBet(player);
         if (tryToPlaceBet) {
           console.log("BET PLACED");
           if (this.jackpot.state === 0) {
-            if (this.canStartCountdown()) {
+            if (this.jackpot.canStartCountdown()) {
               console.log("START COUNTDOWN");
               this.changeState(1);
 
@@ -63,7 +81,7 @@ class Socket {
                   if (i === this.jackpot.countdownSeconds - 1) {
                     // START DRAWING
 
-                    if (this.canStartDrawing()) {
+                    if (this.jackpot.canStartDrawing()) {
                       this.startDrawing();
                     }
                   }
@@ -72,8 +90,39 @@ class Socket {
             }
           }
         } else {
+          console.log("CANT PLACE BET");
         }
       });
+
+      // socket.on("place_bet", async (player, cb) => {
+      //   let tryToPlaceBet = await this.placeBetByPlayer(player);
+      //   if (tryToPlaceBet) {
+      //     console.log("BET PLACED");
+      //     if (this.jackpot.state === 0) {
+      //       if (this.canStartCountdown()) {
+      //         console.log("START COUNTDOWN");
+      //         this.changeState(1);
+
+      //         for (let i = 0; i < this.jackpot.countdownSeconds; i++) {
+      //           setTimeout(() => {
+      //             this.io.emit("increase_jackpot_countdown", {
+      //               seconds: this.jackpot.countdownSeconds - i,
+      //             });
+      //             if (i === this.jackpot.countdownSeconds - 1) {
+      //               // START DRAWING
+
+      //               if (this.canStartDrawing()) {
+      //                 this.startDrawing();
+      //               }
+      //             }
+      //           }, (i + 2) * 1000);
+      //         }
+      //       }
+      //     }
+      //   } else {
+      //     console.log("CANT PLACE BET");
+      //   }
+      // });
     });
   }
 
@@ -95,55 +144,44 @@ class Socket {
     });
   }
 
-  async placeBetByPlayer(player) {
-    let isUserBalanceDecreased = await Database.decreasePlayerBalanceByBet(
-      this.dbClient,
-      player
-    );
-    if (isUserBalanceDecreased) {
-      this.jackpot.players.push(player);
-      this.jackpot.totalBet += player.bet;
+  // async placeBetByPlayer(player) {
+  //   let isUserBalanceDecreased = await Database.decreasePlayerBalanceByBet(
+  //     this.dbClient,
+  //     player
+  //   );
+  //   if (isUserBalanceDecreased) {
+  //     this.jackpot.players.push(player);
+  //     this.jackpot.totalBet += player.bet;
 
-      this.jackpot.players = [
-        ...getPlayersWithChances(this.jackpot.players, this.jackpot.totalBet),
-      ];
+  //     this.jackpot.players = [
+  //       ...Utils.getPlayersWithChances(
+  //         this.jackpot.players,
+  //         this.jackpot.totalBet
+  //       ),
+  //     ];
 
-      this.io.emit("place_bet", {
-        players: this.jackpot.players,
-        totalBet: this.jackpot.totalBet,
-      });
+  //     this.io.emit("place_bet", {
+  //       players: this.jackpot.players,
+  //       totalBet: this.jackpot.totalBet,
+  //     });
 
-      console.log(this.jackpot.players);
-      console.log(this.jackpot.totalBet);
+  //     console.log(this.jackpot.players);
+  //     console.log(this.jackpot.totalBet);
 
-      // log
-      log.info(
-        `user_id ${player.receive_address} put bet, bet value ${player.bet}`
-      );
-      return true;
-    }
-    return false;
-  }
-
-  canStartCountdown() {
-    if (this.jackpot.state === 0 && this.jackpot.players.length >= 2) {
-      return true;
-    }
-    return false;
-  }
-
-  canStartDrawing() {
-    if (this.jackpot.state === 1 && this.jackpot.players.length >= 2) {
-      return true;
-    }
-    return false;
-  }
+  //     // log
+  //     log.info(
+  //       `user_id ${player.receive_address} put bet, bet value ${player.bet}`
+  //     );
+  //     return true;
+  //   }
+  //   return false;
+  // }
 
   startDrawing() {
     console.log("START DRAWING");
     this.changeState(2);
 
-    this.jackpot.players = sortPlayersBySize(this.jackpot.players);
+    this.jackpot.players = Utils.sortPlayersBySize(this.jackpot.players);
 
     for (let i = 0; i < this.jackpot.drawingRounds; i++) {
       let winnerIndex = Math.floor(Math.random() * this.jackpot.players.length);
@@ -166,21 +204,21 @@ class Socket {
   async endDrawing(i, winner) {
     let prize = this.jackpot.calculateWinnerPrize();
     this.changeState(3);
-
+    console.log(winner);
     const isPrizeTransferredToWinner = await Database.transferPrizeToWinnerAccount(
       this.dbClient,
       prize,
       winner
     );
     if (isPrizeTransferredToWinner) {
-      log.info(`${prize} prize transferred to ${winner.receive_address}`);
+      log.info(`${prize} prize transferred to ${winner.address}`);
       let winnerData = await Database.getUserData(
         this.dbClient,
-        winner.receive_address
+        winner.address
       );
-      if (winnerData) {
-        this.io.emit("update_jackpot_winner_data", winnerData);
-      }
+      // if (winnerData) {
+      //   this.io.emit("update_jackpot_winner_data", winnerData);
+      // }
       let clearbetsTimeoutInMilliseconds =
         (i + 1) * this.jackpot.drawingRoundDurationInMilliseconds +
         this.jackpot.clearBetsTimeoutInMilliseconds;

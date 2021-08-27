@@ -121,3 +121,25 @@
 2021-08-26 15:29:33.158 INFO  user_id 018d12641048dbf807e41bc3c84ae90658d9ac0e9cdace1585e2c237d9dc6ea8f9a30a14a5f4240cab68ff639b732cac1a9701bb6b881638fe put bet, bet value 10 
 2021-08-26 15:29:44.451 INFO  user_id 018528afe8f39b6c5f92142313bf14cb5c53a05cc1bad490dff697fc08e6fc81b689fbef9732236e08c1d823bcec495dbeef7323f53e2d54f0 put bet, bet value 10 
 2021-08-26 15:29:54.517 INFO  19 prize transferred to 018d12641048dbf807e41bc3c84ae90658d9ac0e9cdace1585e2c237d9dc6ea8f9a30a14a5f4240cab68ff639b732cac1a9701bb6b881638fe 
+2021-08-27 17:59:30.414 INFO  user_id undefined put bet, bet value 10 
+2021-08-27 19:18:11.342 INFO  user_id undefined put bet, bet value 10 
+2021-08-27 19:18:20.351 INFO  user_id undefined put bet, bet value 10 
+2021-08-27 19:18:30.460 INFO  19 prize transferred to undefined 
+2021-08-27 19:34:09.912 INFO  user_id undefined put bet, bet value 10 
+2021-08-27 19:43:20.388 INFO  user_id undefined put bet, bet value 12.23 
+2021-08-27 19:43:30.510 INFO  21.1185 prize transferred to undefined 
+2021-08-27 19:49:05.676 INFO  user_id undefined put bet, bet value 10 
+2021-08-27 19:49:07.440 INFO  user_id undefined put bet, bet value 30 
+2021-08-27 19:49:17.473 INFO  38 prize transferred to undefined 
+2021-08-27 19:53:10.384 INFO  user_id undefined put bet, bet value 10 
+2021-08-27 19:53:14.342 INFO  user_id undefined put bet, bet value 20 
+2021-08-27 19:53:24.375 INFO  28.5 prize transferred to undefined 
+2021-08-27 19:59:55.258 INFO  user_id undefined put bet, bet value 10 
+2021-08-27 19:59:59.533 INFO  user_id undefined put bet, bet value 10 
+2021-08-27 20:00:09.618 INFO  19 prize transferred to undefined 
+2021-08-27 20:02:55.759 INFO  user_id undefined put bet, bet value 10 
+2021-08-27 20:02:57.227 INFO  user_id undefined put bet, bet value 10 
+2021-08-27 20:03:07.284 INFO  19 prize transferred to 018d12641048dbf807e41bc3c84ae90658d9ac0e9cdace1585e2c237d9dc6ea8f9a30a14a5f4240cab68ff639b732cac1a9701bb6b881638fe 
+2021-08-27 20:05:39.092 INFO  user_id undefined put bet, bet value 10 
+2021-08-27 20:06:05.766 INFO  user_id undefined put bet, bet value 31 
+2021-08-27 20:06:15.868 INFO  38.949999999999996 prize transferred to 018d12641048dbf807e41bc3c84ae90658d9ac0e9cdace1585e2c237d9dc6ea8f9a30a14a5f4240cab68ff639b732cac1a9701bb6b881638fe 

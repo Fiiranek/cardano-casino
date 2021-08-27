@@ -13,6 +13,10 @@
   padding: 1rem;
   margin-bottom: 1rem;
 }
+.jackpotBottom {
+  display: flex;
+  justify-content: center;
+}
 .jackpot {
   border-radius: var(--radius);
   width: 500px;
@@ -26,7 +30,10 @@
   flex-direction: column;
   padding: 0.5rem;
 }
-
+.jackpotPlayersList {
+  width: unset;
+  height: unset;
+}
 .jackpotCountdownSpan {
   color: white;
   font-size: 2rem;

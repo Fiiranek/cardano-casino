@@ -1,6 +1,6 @@
 import { API_URL } from "../constants";
 
-export default class Database {
+export default class RequestManager {
   static async registerUser(credentials) {
     const response = await fetch(`${API_URL}/registerUser`, {
       method: "POST",
@@ -9,19 +9,12 @@ export default class Database {
         "Content-Type": "application/json",
       },
     });
-    //const result = await response.json();
     const result = await response;
     return result;
   }
 
-  // static getUserData(userId) {
-  //   return fetch(API_URL + "/users?userId=" + userId);
-  // }
-
-  static async getUserData(userReceiveAddress) {
-    const response = await fetch(
-      API_URL + "/users?userReceiveAddress=" + userReceiveAddress
-    );
+  static async getUserData(userAddress) {
+    const response = await fetch(API_URL + "/users?userAddress=" + userAddress);
     const data = await response.json();
     if (data.msg) return false;
     return data;

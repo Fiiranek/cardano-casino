@@ -14,8 +14,8 @@ function SpinTile({ player, totalBet }) {
       }}
     >
       <span className={styles.playerNick}>
-        {Utils.shortenAddress(player.receive_address)} - {percent.toFixed(2)}%
-        WIN
+        {Utils.shortenAddress(player.address)} - {player.bet} ADA -
+        {percent.toFixed(2)}% WIN
       </span>
     </div>
   );
