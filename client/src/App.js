@@ -17,9 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   updateJackpotPlayers,
   updateJackpotTotaBet,
-  updateJackpotCountdownState,
   updateJackpotCountdownSeconds,
-  updateJackpotDrawingState,
   updateJackpotState,
 } from "./store/actions";
 import Utils from "./modules/Utils";
@@ -30,14 +28,13 @@ function App({ socket }) {
   const players = useSelector((state) => state.jackpotPlayers);
   const totalBet = useSelector((state) => state.jackpotTotalBet);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // socket.onconnect = () => {
-    //   console.log("connected...");
-    //   setIsLoading(false);
-    //   // socket.emit("ehlo", currentUser);
-    // };
+    socket.on("connect", () => {
+      console.log("connected");
+      setIsLoading(false);
+    });
 
     socket.on("place_bet", (jackpotData) => {
       dispatch(updateJackpotPlayers(jackpotData.players));
@@ -54,6 +51,10 @@ function App({ socket }) {
 
     socket.on("change_jackpot_state", async (data) => {
       dispatch(updateJackpotState(data.state));
+    });
+
+    socket.on("update_jackpot_winner_data", async (winnerData) => {
+      console.log(winnerData);
     });
   }, []);
 

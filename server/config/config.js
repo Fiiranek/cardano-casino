@@ -5,7 +5,8 @@ const DB_CONFIG = {
   database: process.env.PG_DATABASE,
   port: 5432,
 };
-
+const API_KEY = process.env.API_KEY;
 module.exports = {
   DB_CONFIG,
+  API_KEY,
 };

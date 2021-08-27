@@ -4,6 +4,7 @@ const Socket = require("./Socket");
 const helmet = require("helmet");
 const config = require("./config/config");
 const cors = require("cors");
+const Utils = require("./Utils");
 const app = express();
 const SOCKET_PORT = 8000;
 const API_PORT = 5000;
@@ -32,19 +33,34 @@ async function main() {
   });
 
   app.get("/users", async (req, res) => {
-    await Database.getUserData(client, req, res);
+    //await Database.getUserData(client, req, res);
+    let userAddress = req.query.userReceiveAddress;
+    let userData = await Database.getUserData(client, userAddress);
+
+    if (userData) {
+      res.status(200).send(userData);
+    } else {
+      res.status(400).send({ msg: "Could not get user data" });
+    }
   });
 
   app.post("/deposit", async (req, res) => {
-    await Database.deposit(client, req, res);
+    const apiKey =
+      req.body.apiKey || req.header("apiKey") || req.headers["API_KEY"];
+    const isApiKeyValid = Utils.verifyApiKey(apiKey);
+    if (isApiKeyValid) {
+      await Database.deposit(client, req, res);
+    } else {
+      res.status(400).send({ msg: "Invalid api key" });
+    }
   });
 
-  app.listen(API_PORT, () => {
-    console.log(`Express app listening at http://localhost:${API_PORT}`);
-  });
+  // app.listen(API_PORT, () => {
+  //   console.log(`Express app listening at http://localhost:${API_PORT}`);
+  // });
 
   server.listen(SOCKET_PORT, () => {
-    console.log(`Example app listening at http://localhost:${SOCKET_PORT}`);
+    console.log(`Socket server listening at http://localhost:${SOCKET_PORT}`);
   });
 }
 

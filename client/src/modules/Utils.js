@@ -1,5 +1,4 @@
-// const serializationLib = require("@emurgo/cardano-serialization-lib-nodejs");
-// serializationLib.Transaction
+// const serializationLib = require("@emurgo/cardano-serialization-lib-nodejs");)
 export default class Utils {
   // class Utils {
   static getRandomArrElement = (arr) => {
@@ -76,7 +75,7 @@ export default class Utils {
   static calculateWinnerPrize(totalBet) {
     console.log(totalBet);
     const commision = 0.05;
-    const prize = totalBet * (1 - this.commision);
+    const prize = totalBet * (1 - commision);
     return prize;
   }
 }

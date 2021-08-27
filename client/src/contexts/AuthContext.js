@@ -4,6 +4,7 @@ import Database from "../modules/Database";
 import { API_URL } from "../constants";
 import Utils from "../modules/Utils";
 import { send } from "process";
+import { useAlert } from "react-alert";
 const AuthContext = createContext();
 
 export function useAuth() {
@@ -12,7 +13,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(undefined);
-
+  // const alertLib = useAlert();
   //const registerUser = async (credentials) => {
   const registerUser = async () => {
     // try {
@@ -47,7 +48,10 @@ export function AuthProvider({ children }) {
         const registerInDbResult = await Database.registerUser(credentials);
 
         if (registerInDbResult.status === 200) {
-          // success
+          const userData = await registerInDbResult.clone().json();
+          setCurrentUser(userData);
+          // alertLib.show("Registered!");
+          alert("Registered!");
           return true;
         } else {
           return false;
@@ -70,7 +74,7 @@ export function AuthProvider({ children }) {
       if (isCardanoEnabled) {
         let receiveAddress = await Utils.getReceiveAddress();
         let userData = await Database.getUserData(receiveAddress);
-        console.log(userData);
+
         if (userData) {
           setCurrentUser(userData);
           return userData;

@@ -1,12 +1,12 @@
 import firebase from "firebase";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCfb_SFuJlVuRUCXscqDC7O9IxRBJ_CJsk",
-  authDomain: "euro-2020-typer.firebaseapp.com",
-  projectId: "euro-2020-typer",
-  storageBucket: "euro-2020-typer.appspot.com",
-  messagingSenderId: "177327653924",
-  appId: "1:177327653924:web:d11f818d0cd399d06d04b1",
+  apiKey: "AIzaSyBl7O7LbhD1tw04esb8H_0J1jcCdJRSe6g",
+  authDomain: "cardano-casino.firebaseapp.com",
+  projectId: "cardano-casino",
+  storageBucket: "cardano-casino.appspot.com",
+  messagingSenderId: "679965572345",
+  appId: "1:679965572345:web:95f5df620d392eb9c53628",
 };
 
 if (!firebase.apps.length) {

@@ -1,5 +1,7 @@
+const Transaction = require("./modules/Transaction");
 const pg = require("pg");
 const uuid = require("uuid");
+const CARDANO_NODE_IP = "75.119.156.5";
 class Database {
   static async connect(DB_CONFIG) {
     const client = new pg.Client(DB_CONFIG);
@@ -32,8 +34,7 @@ class Database {
 
     const // username = req.body.username,
       receiveAddress = req.body.receiveAddress,
-      sendAddress = req.body.sendAddress,
-      userId = uuid.v4();
+      sendAddress = req.body.sendAddress;
 
     // ensure that all data is provided
     //if (!username || !receiveAddress || !sendAddress) {
@@ -53,39 +54,47 @@ class Database {
     );
 
     if (queryResult.rows.length > 0) {
-      res.status(200).send({ msg: "Account already exists" });
+      console.log(queryResult.rows[0]);
+      res.status(200).send(queryResult.rows[0]);
       return;
     }
 
     const userRegisterQuery = await client.query(
-      "INSERT INTO casino_users(receive_address,send_address,balance,start_balance) VALUES ($1,$2,0,0)",
+      "INSERT INTO casino_users(receive_address,send_address,balance,start_balance) VALUES ($1,$2,1000,0)",
       [receiveAddress, sendAddress]
     );
     if (userRegisterQuery.rowCount !== 1) {
       res.status(400).send({ msg: "Could not register user" });
       return;
     }
-    res.status(200).send({ msg: "Success" });
+
+    res.status(200).send({
+      receive_address: receiveAddress,
+      send_address: sendAddress,
+      balance: 0,
+      start_balance: 0,
+    });
     return;
   }
 
-  static async getUserData(client, req, res) {
+  // static async getUserData(client, req, res) {
+  static async getUserData(client, searchedUserReceiveAddress) {
     //const searchedUserId = req.query.userId;
-    const searchedUserReceiveAddress = req.query.userReceiveAddress;
+    // const searchedUserReceiveAddress = req.query.userReceiveAddress;
     if (!searchedUserReceiveAddress) {
-      res.status(400).send({ msg: "Could not get user data" });
-      return;
+      //res.status(400).send({ msg: "Could not get user data" });
+      return false;
     }
     const queryResult = await client.query(
       "SELECT * FROM casino_users WHERE receive_address=$1",
       [searchedUserReceiveAddress]
     );
     if (queryResult.rows.length > 0) {
-      res.status(200).send(queryResult.rows[0]);
-      return;
+      //res.status(200).send(queryResult.rows[0]);
+      return queryResult.rows[0];
     }
-    res.status(400).send({ msg: "Could not get user data" });
-    return;
+    //res.status(400).send({ msg: "Could not get user data" });
+    return false;
   }
 
   static async decreasePlayerBalanceByBet(client, user) {
@@ -160,6 +169,18 @@ class Database {
   }
 
   static async deposit(client, req, res) {
+    const ip = req.headers["x-real-ip"] || req.socket.remoteAddress;
+
+    if (ip != CARDANO_NODE_IP) {
+      res.status(400).send({ msg: "Wrong host" });
+      return;
+    }
+
+    if (!depositAddress || !depositAmount) {
+      res.status(400).send({ msg: "Could not deposit" });
+      return;
+    }
+
     let depositAddress = req.body.address || req.body.deposit_address,
       depositAmount = req.body.amount || req.body.deposit_amount;
     console.log(depositAddress, depositAmount);
@@ -172,7 +193,7 @@ class Database {
       "SELECT balance FROM casino_users WHERE receive_address=$1",
       [depositAddress]
     );
-    console.log(queryResult.rows[0].balance);
+
     if (queryResult.rows.length > 0) {
       const userBalance = queryResult.rows[0].balance;
       const newBalance = userBalance + depositAmount;
@@ -180,8 +201,15 @@ class Database {
         "UPDATE casino_users SET balance=$1 WHERE receive_address=$2",
         [newBalance, depositAddress]
       );
-      console.log(newBalance);
+
       if (result.rowCount === 1) {
+        // ADD DEPOSIT TRANSACTION TO TRANSACTIONS LIST
+        await Database.addTransactionToUserTransactionsList(
+          depositAddress,
+          depositAmount,
+          "DEPOSIT"
+        );
+
         res.status(200).send({ msg: "Deposit success" });
         return;
       } else {
@@ -191,6 +219,24 @@ class Database {
     }
     res.status(400).send({ msg: "Could not deposit" });
     return;
+  }
+
+  static async addTransactionToUserTransactionsList(address, amount, type) {
+    const transaction = new Transaction(address, amount, type);
+    const addTransactionQuery = await client.query(
+      "INSERT INTO casino_transactions(address,amount,type,date) VALUES ($1,$2,$3,$4)",
+      [
+        transaction.address,
+        transaction.amount,
+        transaction.type,
+        transaction.date,
+      ]
+    );
+    if (addTransactionQuery.rowCount !== 1) {
+      return false;
+    } else {
+      return true;
+    }
   }
 }
 module.exports = {

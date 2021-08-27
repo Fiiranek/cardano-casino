@@ -1,4 +1,5 @@
 // const Database = require("./Database").Database;
+const Database = require("./Database").Database;
 class Jackpot {
   constructor() {
     this.players = [];
@@ -12,38 +13,38 @@ class Jackpot {
     this.commision = 0.05;
   }
 
+  // async placeBetByPlayer(dbClient, player) {
+  //   let isUserBalanceDecreased = await Database.decreasePlayerBalanceByBet(
+  //     dbClient,
+  //     player
+  //   );
+  //   if (isUserBalanceDecreased) {
+  //     this.players.push(player);
+  //     this.totalBet += player.bet;
+
+  //     this.players = [...getPlayersWithChances(this.players, this.totalBet)];
+
+  //     this.io.emit("place_bet", {
+  //       players: this.players,
+  //       totalBet: this.totalBet,
+  //     });
+
+  //     console.log(this.players);
+  //     console.log(this.totalBet);
+
+  //     // log
+  //     log.info(
+  //       `user_id ${player.receive_address} put bet, bet value ${player.bet}`
+  //     );
+  //     return true;
+  //   }
+  //   return false;
+  // }
+
   calculateWinnerPrize() {
     const prize = this.totalBet * (1 - this.commision);
     return prize;
   }
-
-  //   async placeBetByPlayer(player) {
-  //     let isUserBalanceDecreased = await Database.decreasePlayerBalanceByBet(
-  //       this.dbClient,
-  //       player
-  //     );
-  //     if (isUserBalanceDecreased) {
-  //       this.jackpot.players.push(player);
-  //       this.jackpot.totalBet += player.bet;
-
-  //       this.jackpot.players = [
-  //         ...getPlayersWithChances(this.jackpot.players, this.jackpot.totalBet),
-  //       ];
-
-  //       this.io.emit("place_bet", {
-  //         players: this.jackpot.players,
-  //         totalBet: this.jackpot.totalBet,
-  //       });
-
-  //       console.log(this.jackpot.players);
-  //       console.log(this.jackpot.totalBet);
-
-  //       // log
-  //       log.info(`user_id ${player.user_id} put bet, bet value ${player.bet}`);
-  //       return true;
-  //     }
-  //     return false;
-  //   }
 
   //   changeState(newState) {
   //     this.state = newState;

@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { useAlert } from "react-alert";
 import Confetti from "react-confetti";
 import Database from "../../modules/Database";
+
 export function Jackpot({ socket }) {
   let { currentUser, setCurrentUser } = useAuth();
   const players = useSelector((state) => state.jackpotPlayers);
@@ -19,7 +20,7 @@ export function Jackpot({ socket }) {
 
   const [betValue, setBetValue] = useState(0);
 
-  const alert = useAlert();
+  const alertLib = useAlert();
 
   const increaseBetBtnHandler = (e) => {
     setBetValue(betValue + parseFloat(e.target.value));
@@ -38,7 +39,7 @@ export function Jackpot({ socket }) {
 
   const placeBetEmitter = (socket) => {
     if (betValue <= 0) {
-      alert.show("Bet value must be bigger than 0");
+      alertLib.show("Bet value must be bigger than 0");
       return;
     }
     if (currentUser) {
@@ -54,10 +55,10 @@ export function Jackpot({ socket }) {
         const newBalance = currentUser.balance - betValue;
 
         setCurrentUser({ ...currentUser, balance: newBalance });
-        alert.show(`${betValue} ADA bet placed`);
+        alertLib.show(`${betValue} ADA bet placed`);
         console.log("BET PLACED");
       } else {
-        alert.show(`Not enough funds`);
+        alertLib.show(`Not enough funds`);
       }
     }
   };

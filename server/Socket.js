@@ -45,9 +45,8 @@ class Socket {
 
     this.io.on("connection", (socket) => {
       this.onPlayerConnect();
-      console.log(socket.id);
+
       socket.on("place_bet", async (player, cb) => {
-        console.log("HERE");
         let tryToPlaceBet = await this.placeBetByPlayer(player);
         if (tryToPlaceBet) {
           console.log("BET PLACED");
@@ -175,6 +174,13 @@ class Socket {
     );
     if (isPrizeTransferredToWinner) {
       log.info(`${prize} prize transferred to ${winner.receive_address}`);
+      let winnerData = await Database.getUserData(
+        this.dbClient,
+        winner.receive_address
+      );
+      if (winnerData) {
+        this.io.emit("update_jackpot_winner_data", winnerData);
+      }
       let clearbetsTimeoutInMilliseconds =
         (i + 1) * this.jackpot.drawingRoundDurationInMilliseconds +
         this.jackpot.clearBetsTimeoutInMilliseconds;
